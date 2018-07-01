@@ -1,0 +1,196 @@
+#!/bin/bash
+# checked with: shellcheck -x start-stop-status.sh
+
+# Source package specific variable and functions
+SVC_SETUP="$(dirname "$0")/service-setup"
+if [ -r "${SVC_SETUP}" ]; then
+    #shellcheck source=service-setup
+    . "${SVC_SETUP}"
+fi
+
+SCRIPT_REDIRECT="$SCRIPT_DIR/redirect.sh"
+SCRIPT_TPROXY="$SCRIPT_DIR/tproxy.sh"
+
+start_daemon ()
+{
+    local CONF_FILE started retcode tcpredir udpredir
+    started=0
+    tcpredir=0
+    udpredir=0
+
+    #Look for any ss-<ssserver>-<name>.json config files in configuration etc folder, and optionaly ss-server-name.params
+    while read -r CONF_FILE
+    do
+        local SS_SERVER CONF_NAME PID_FILE PARAMS CMD
+
+        SS_SERVER=$(echo "$CONF_FILE" | sed -E 's,'"$CONFFILES_REGEX"',\2,')
+        CONF_NAME=$(echo "$CONF_FILE" | sed -E 's,'"$CONFFILES_REGEX"',\4,')
+
+        PID_FILE="$PID_DIR/$SS_SERVER${CONF_NAME:+-$CONF_NAME}.pid"
+
+        # Allow to have specific parameters in ss-<server>-xxx.params
+        # not really needed because most parameters can be specified in the json file, so commented out
+        #PARAMS="$(grep '^-' $CONFIG_DIR/$SS_SERVER${CONF_NAME:+-$CONF_NAME}.params 2>/dev/null)"
+
+        CMD="$INSTALL_DIR/bin/$SS_SERVER $PARAMS -c $CONF_FILE -f $PID_FILE"
+
+        if [ -f "$PID_FILE" ] && kill -0 "$(cat "$PID_FILE")" > /dev/null 2>&1; then
+            echo "  $SS_SERVER $CONF_NAME is already running"
+        else
+            # tcp is inactive if option udp_only or -U (default is active)
+            local tcpmode
+            if grep -E -q 'udp_only' "$CONF_FILE" || [ -z "${CMD##* -U*}" ]; then
+                tcpmode=0
+            else
+                tcpmode=1
+            fi
+
+            # udp is active if option tcp_and_udp or udp_only or -u or -U (default is inactive)
+            local udpmode
+            if grep -E -q 'tcp_and_udp|udp_only' "$CONF_FILE" || [ -z "${CMD##* -u*}" ] || [ -z "${CMD##* -U*}" ]; then
+                udpmode=1
+            else
+                udpmode=0
+            fi
+
+            # Run as root if this is ss-redir and with udp, otherwise as standard user
+            # needed because it seems DSM does not support (?) setcap cap_net_admin+ep ss-redir
+            if [ "$SS_SERVER" = "ss-redir" ] && [ "$udpmode" = 1 ]; then
+                $CMD
+                retcode=$?
+            else
+                /bin/su shadowsocks-libev -s /bin/sh -c "$CMD"
+                retcode=$?
+            fi
+
+            if [ "$retcode" != 0 ]
+            then
+                echo "Startup of $DNAME $SS_SERVER failed for config file $CONF_FILE" >> "$SYNOPKG_TEMP_LOGFILE"
+            else
+                renice -5 "$(cat "$PID_FILE")"
+                started=1
+            fi
+
+            # Remember to run iptables redirection scripts if ss-redir is used
+            if [ "$SS_SERVER" = "ss-redir" ] && [ "$tcpmode" = 1 ]; then
+                tcpredir=1
+            fi
+            if [ "$SS_SERVER" = "ss-redir" ] && [ "$udpmode" = 1 ]; then
+                udpredir=1
+            fi
+        fi
+    done < <( find -L "$CONFIG_DIR" -maxdepth 1 -regextype posix-extended -regex "$CONFFILES_REGEX" -type f )
+
+    if [ "$started" = 1 ]
+    then
+        # At least 1 daemon could start, update the used ports toward DSM if needed
+        "$SCRIPT_DIR/gensc.sh"
+    else
+        echo 'Nothing started: check config file(s) ss-(local|server|redir|tunnel)[-<confname>].json in: '"$CONFIG_DIR" >> "$SYNOPKG_TEMP_LOGFILE"
+        exit 1
+    fi
+
+    # Run network configuration scripts for ss-redir (iptables REDIRECT / TPROXY...)
+    if [ "$tcpredir" = 1 ] && [ -f "$SCRIPT_REDIRECT" ]; then
+        if [[ -x "$SCRIPT_REDIRECT" && $(stat -c %A "$SCRIPT_REDIRECT") =~ r...-..-.$ ]]; then
+            "$SCRIPT_REDIRECT"
+        else
+            echo "ERROR: Script file must only be writable by its user: $SCRIPT_REDIRECT" >> "$SYNOPKG_TEMP_LOGFILE"
+        fi
+    fi
+    if [ "$udpredir" = 1 ] && [ -f "$SCRIPT_TPROXY" ]; then
+        if [[ -x "$SCRIPT_TPROXY" && $(stat -c %A "$SCRIPT_TPROXY") =~ r...-..-.$ ]]; then
+            "$SCRIPT_TPROXY"
+        else
+            echo "ERROR: Script file must only be writable by its user: $SCRIPT_TPROXY" >> "$SYNOPKG_TEMP_LOGFILE"
+        fi
+    fi
+}
+
+stop_daemon ()
+{
+    local PID_FILE
+
+    while read -r PID_FILE
+    do
+        kill "$(cat "$PID_FILE")"
+        wait_for_death 20 "$(cat "$PID_FILE")" || kill -9 "$(cat "$PID_FILE")"
+        rm -f "$PID_FILE"
+    done < <( find -L "${PID_DIR}" -maxdepth 1 -regextype posix-extended -regex '.*/'"$PIDFILES_REGEX" -type f )
+   
+}
+
+# Status is True if at least 1 ss-<server> is running, False if none is running
+# Quiet if called with a parameter 0 
+daemon_status ()
+{
+    local stopped CONF_FILE SS_SERVER CONF_NAME PID_FILE
+    stopped=1
+
+    while read -r CONF_FILE
+    do
+        SS_SERVER=$(echo "$CONF_FILE" | sed -E 's,'"$CONFFILES_REGEX"',\2,')
+        CONF_NAME=$(echo "$CONF_FILE" | sed -E 's,'"$CONFFILES_REGEX"',\4,')
+
+        PID_FILE="$PID_DIR/$SS_SERVER${CONF_NAME:+-$CONF_NAME}.pid"
+
+        if [ -f "$PID_FILE" ] && kill -0 "$(cat "$PID_FILE")" > /dev/null 2>&1; then
+            [ -n "$1" ] || echo "  $SS_SERVER $CONF_NAME is running"
+            stopped=0
+        else
+            [ -n "$1" ] || echo "  $SS_SERVER $CONF_NAME is not running"
+            rm -f "$PID_FILE"
+        fi
+    done < <( find -L "${CONFIG_DIR}" -maxdepth 1 -regextype posix-extended -regex '.*/'"$CONFFILES_REGEX" -type f )
+
+    return $stopped
+}
+
+wait_for_death ()
+{
+    local counter=$1
+    local daemonpid=$2
+    while [ "${counter}" -gt 0 ]; do
+        kill -0 "$daemonpid" > /dev/null 2>&1 || return 0
+        let counter=counter-1
+        sleep 1
+    done
+    return 1
+}
+
+# script is run from unexisting home directory of homeless user, which bugs some functions, so go to /tmp instead
+# shellcheck disable=SC2164
+cd "${TMPDIR-/tmp}"
+
+case $1 in
+    start)
+        if daemon_status 0; then
+            echo "${DNAME} is already running (at least 1 server is)"
+        else
+            echo "Starting ${DNAME} ..."
+            start_daemon
+        fi
+        ;;
+    stop)
+        if daemon_status 0; then
+            echo "Stopping ${DNAME} ..."
+            stop_daemon
+        else
+            echo "${DNAME} is not running"
+        fi
+        ;;
+    status)
+        if daemon_status; then
+            exit 0
+        else
+            echo "${DNAME} is not running"
+            exit 3
+        fi
+        ;;
+    log)
+        echo "${LOG_FILE}"
+        ;;
+    *)
+        exit 1
+        ;;
+esac

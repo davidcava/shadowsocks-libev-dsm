@@ -1,0 +1,9 @@
+{
+        "port-config": {
+                "protocol-file": "port_conf/shadowsocks-libev.sc"
+        },
+	"syslog-config": {
+		"patterndb-relpath": "etc/shadowsocks-libev.conf"
+	}
+} 
+

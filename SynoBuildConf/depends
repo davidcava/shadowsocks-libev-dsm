@@ -1,0 +1,6 @@
+[BuildDependent]
+mbedtls
+libev
+
+[default]
+all="6.1"

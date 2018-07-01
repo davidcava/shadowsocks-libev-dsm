@@ -1,0 +1,55 @@
+#!/bin/sh
+
+if [ "$SYNOPKG_PKGNAME" = "" ] || [ "$SYNOPKG_PKGDEST" = "" ]; then
+    echo "Environment variables SYNOPKG_xxx are not set, are we launched by DSM?" >> /dev/stderr
+    echo "If debugging scripts directly execute first: . ./setsynovars.debug" >> /dev/stderr
+    exit 1
+fi
+
+if [ "$SYNOPKG_TEMP_LOGFILE" = "" ]; then
+    # DSM does not always set SYNOPKG_TEMP_LOGFILE as it should
+    SYNOPKG_TEMP_LOGFILE=/dev/stderr
+fi
+
+export SYNOPKG_PKGNAME
+export SYNOPKG_PKGDEST
+export SYNOPKG_TEMP_LOGFILE
+
+# Package technical name / id
+PACKAGE="$SYNOPKG_PKGNAME"
+
+# Package full name - not possible to get it?
+DNAME="$SYNOPKG_PKGNAME"
+
+# Installation directory .../target, files in here replaced when the package is updated
+INSTALL_DIR="$SYNOPKG_PKGDEST"
+
+# Directory to store running server pid(s)
+PID_DIR="$INSTALL_DIR/var"
+
+# Configuration files directory
+CONFIG_DIR="/var/packages/$SYNOPKG_PKGNAME/etc"
+
+# Script directory
+SCRIPT_DIR=$(readlink -f "$(dirname "$0")")
+
+# start-stop-status script redirect stdout/stderr to LOG_FILE
+LOG_FILE="$SYNOPKG_PKGDEST/var/$SYNOPKG_PKGNAME.log"
+
+# Those evnt variables impact regex matching
+export LANG=C
+export LC_ALL=C
+
+export LD_LIBRARY_PATH="$INSTALL_DIR/lib"
+export PATH="$INSTALL_DIR/bin:$PATH"
+
+# Standard iptables installed in DSM
+IPT=/sbin/iptables
+
+# iptables that supports TProxy
+INSTALL_DIR_IPT2="/var/packages/iptables/target"
+
+# Regular expression for filenames of the configuration files, matching like: <path>/ss-local-Korea.json
+CONFFILES_REGEX='(.+/)(ss-local|ss-server|ss-redir|ss-tunnel)(-([a-zA-Z0-9]*))?.json$'
+PIDFILES_REGEX='(.+/)(ss-local|ss-server|ss-redir|ss-tunnel)(-([a-zA-Z0-9]*))?.pid$'
+

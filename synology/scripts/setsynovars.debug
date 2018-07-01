@@ -1,0 +1,8 @@
+#!/bin/bash
+# Execute this file to set the synology variables needed to directly execute the script files
+# (without having DSM framework call them)
+
+export SYNOPKG_PKGNAME=shadowsocks-libev
+export SYNOPKG_PKGDEST=/var/packages/$SYNOPKG_PKGNAME/target
+export SYNOPKG_TEMP_LOGFILE=/dev/stderr
+

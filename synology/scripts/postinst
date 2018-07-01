@@ -1,0 +1,33 @@
+#!/bin/sh
+# Copyright (c) 2018 David Cavallini
+#    This file is free software: you can redistribute it and/or modify
+#    it under the terms of the GNU General Public License as published by
+#    the Free Software Foundation, either version 2 of the License, or
+#    (at your option) any later version.
+#
+#    It is distributed in the hope that it will be useful,
+#    but WITHOUT ANY WARRANTY; without even the implied warranty of
+#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#    GNU General Public License for more details.
+#
+#    You should have received a copy of the GNU General Public License
+#    along with this file.  If not, see <http://www.gnu.org/licenses/>.
+
+# checked with: shellcheck -x postinst.sh
+
+# Source package specific variable and functions
+SVC_SETUP="$(dirname "$0")/service-setup"
+if [ -r "${SVC_SETUP}" ]; then
+    #shellcheck source=service-setup
+    . "${SVC_SETUP}"
+fi
+
+conf_files=$(find -L "$CONFIG_DIR" -maxdepth 1 -regextype posix-extended -regex "$CONFFILES_REGEX" -type f -printf '%f ')
+if [ -z "$conf_files" ]
+then
+    echo "Configuration file(s) ss-*.json needs to be created in $CONFIG_DIR" >>"$SYNOPKG_TEMP_LOGFILE"
+else
+    echo "Using configuration files already existing in $CONFIG_DIR: $conf_files" >>"$SYNOPKG_TEMP_LOGFILE"
+fi
+
+exit 0

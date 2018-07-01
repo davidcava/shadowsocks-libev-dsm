@@ -1,0 +1,60 @@
+#!/bin/bash
+# Copyright (c) 2000-2015 Synology Inc. All rights reserved.
+
+PKG_NAME="shadowsocks-libev"
+INST_DIR="/tmp/_${PKG_NAME}"
+PKG_DIR="/tmp/_${PKG_NAME}_pkg"
+PKG_DEST="/image/packages"
+
+LANG=C; export LANG
+LC_ALL=C; export LC_ALL
+
+PrepareDirs() {
+    for dir in $INST_DIR $PKG_DIR; do
+        rm -rf "$dir"
+    done
+    for dir in $INST_DIR $PKG_DIR $PKG_DEST; do
+        mkdir -p "$dir"
+    done
+}
+
+SetupPackageFiles() {
+    make install
+
+    echo SynoBuildConf/install: removing lib include
+    rm -fr $INST_DIR/include
+    rm -fr $INST_DIR/lib
+
+    echo SynoBuildConf/install: creating lib with dependant libraries
+    mkdir $INST_DIR/lib
+    ldd $INST_DIR/bin/ss-local | grep /usr/local/lib | cut -d' ' -f 3 | while read solib
+    do
+        cp -L -t $INST_DIR/lib $solib
+    done
+
+    echo SynoBuildConf/install: Adding DSM specific dirs
+    mkdir $INST_DIR/var
+    install -D -m 0644 -t $INST_DIR/port_conf synology/port_conf/$PKG_NAME.sc
+    install -D -m 0644 -t $INST_DIR/etc synology/etc/*
+
+    echo SynoBuildConf/install: Adding DSM packaging files
+    synology/INFO.sh > INFO
+    cp INFO "${PKG_DIR}"
+    cp -r synology/scripts/ "${PKG_DIR}"
+    cp -r synology/conf/ "${PKG_DIR}"
+    cp synology/PACKAGE_ICON{,_256}.PNG "${PKG_DIR}"
+}
+
+MakePackage() {
+    source /pkgscripts/include/pkg_util.sh
+    pkg_make_package $INST_DIR $PKG_DIR
+    pkg_make_spk $PKG_DIR $PKG_DEST
+}
+
+main() {
+    PrepareDirs
+    SetupPackageFiles
+    MakePackage 
+}
+
+main "$@"
