@@ -34,25 +34,22 @@ Example: `/var/packages/shadowsocks-libev/etc/ss-redir-Korea.ipt-rules-exclude`
 - Add the 2 subfolders `synology` and `SynoBuildConf` from `shadowsocks-libev-dsm` into the shadowsocks-libev source folder
 - Build for your architecture, example
   ```sh
-  /toolkit/pkgscripts-ng/PkgCreate.py -p evansport -x0 -c privoxy
+  /toolkit/pkgscripts-ng/PkgCreate.py -p evansport -x0 -c shadowsocks-libev
   ```
 - If everything went fine, package is now in `/toolkit/result_spk`
 
 # Licence
     Copyright (c) 2018 David Cavallini
 
-    privoxy-dsm is free software: you can redistribute it and/or modify
+    shadowsocks-libev-dsm is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation, either version 2 of the License, or
     (at your option) any later version.
     
-    Binary (spk) packages in Release area combine files from Privoxy and privoxy-dsm.
-    The applicable licence for those spk files is GPL v2, to comply with Privoxy licence.
-
-    privoxy-dsm is distributed in the hope that it will be useful,
+    shadowsocks-libev-dsm is distributed in the hope that it will be useful,
     but WITHOUT ANY WARRANTY; without even the implied warranty of
     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
     GNU General Public License for more details.
 
     You should have received a copy of the GNU General Public License
-    along with privoxy-dsm.  If not, see <http://www.gnu.org/licenses/>.
+    along with shadowsocks-libev-dsm.  If not, see <http://www.gnu.org/licenses/>.
