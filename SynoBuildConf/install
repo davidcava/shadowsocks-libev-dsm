@@ -26,11 +26,10 @@ SetupPackageFiles() {
     rm -fr $INST_DIR/lib
 
     echo SynoBuildConf/install: creating lib with dependant libraries
+    echo No easy way to find out automatically which library is needed as ldd does not work cross architecture
     mkdir $INST_DIR/lib
-    ldd $INST_DIR/bin/ss-local | grep /usr/local/lib | cut -d' ' -f 3 | while read solib
-    do
-        cp -L -t $INST_DIR/lib $solib
-    done
+    cp -L -t $INST_DIR/lib /usr/local/lib/libev.so.4
+    cp -L -t $INST_DIR/lib /usr/local/lib/libmbedcrypto.so.1
 
     echo SynoBuildConf/install: Adding DSM specific dirs
     mkdir $INST_DIR/var

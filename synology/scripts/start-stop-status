@@ -86,7 +86,7 @@ start_daemon ()
         # At least 1 daemon could start, update the used ports toward DSM if needed
         "$SCRIPT_DIR/gensc.sh"
     else
-        echo 'Nothing started: check config file(s) ss-(local|server|redir|tunnel)[-<confname>].json in: '"$CONFIG_DIR" >> "$SYNOPKG_TEMP_LOGFILE"
+        echo 'Nothing started: check config file(s) ss-(local|server|redir|tunnel)[-confname].json in: '"$CONFIG_DIR" >> "$SYNOPKG_TEMP_LOGFILE"
         exit 1
     fi
 
