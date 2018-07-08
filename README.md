@@ -32,9 +32,31 @@ Example: `/var/packages/shadowsocks-libev/etc/ss-redir-Korea.ipt-rules-exclude`
 - Setup the DSM toolkit for your model according to the official Synology [Developer's guide](https://developer.synology.com/developer-guide/)
 - Download shadowsocks-libev source code into the toolkit
   ```sh
+  cd /toolkit/source
+  git clone https://github.com/shadowsocks/shadowsocks-libev.git
   cd shadowsocks-libev
+  git submodule update --init --recursive
   ```
-- Add the 2 subfolders `synology` and `SynoBuildConf` from `shadowsocks-libev-dsm` into the shadowsocks-libev source folder
+- Add or link the 2 subfolders `synology` and `SynoBuildConf` from `shadowsocks-libev-dsm` into the shadowsocks-libev source folder
+  ```sh
+  git clone https://github.com/shadowsocks/shadowsocks-libev-dsm.git
+  ln -s ./shadowsocks-libev-dsm/SynoBuildConf ./shadowsocks-libev-dsm/synology .
+  ```
+- Download libev source into the toolkit and add the DSM build script
+  ```sh
+  cd /toolkit/source
+  cvs -z3 -d :pserver:anonymous@cvs.schmorp.de/schmorpforge co libev
+  cd libev
+  ln -s ../shadowsocks-libev/shadowsocks-libev-dsm/libev/SynoBuildConf .
+  ```
+- Download mbedtls source into the toolkit and add the DSM build script
+  (cannot use Synology provided mbedtls library because it misses MBEDTLS_CIPHER_MODE_CFB)
+  ```sh
+  cd /toolkit/source
+  git clone https://github.com/ARMmbed/mbedtls
+  cd mbedtls
+  ln -s ../shadowsocks-libev/shadowsocks-libev-dsm/mbedtls/SynoBuildConf .
+  ```
 - Build for your architecture, example
   ```sh
   /toolkit/pkgscripts-ng/PkgCreate.py -p evansport -x0 -c shadowsocks-libev
