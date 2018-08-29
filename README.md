@@ -57,6 +57,14 @@ Example: `/var/packages/shadowsocks-libev/etc/ss-redir-Korea.ipt-rules-exclude`
   cd mbedtls
   ln -s ../shadowsocks-libev/shadowsocks-libev-dsm/mbedtls/SynoBuildConf .
   ```
+- Download simple-obfs source into the toolkit and add the DSM build script
+  ```sh
+  cd /toolkit/source
+  git clone https://github.com/shadowsocks/simple-obfs.git
+  cd simple-obfs
+  git submodule update --init --recursive
+  ln -s ../shadowsocks-libev/shadowsocks-libev-dsm/simple-obfs/SynoBuildConf .
+  ```
 - Build for your architecture, example
   ```sh
   /toolkit/pkgscripts-ng/PkgCreate.py -p evansport -x0 -c shadowsocks-libev
