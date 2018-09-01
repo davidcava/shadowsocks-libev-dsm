@@ -17,7 +17,6 @@ Additional instances can be started by creating more configuration files: `ss-lo
 - Configuration needs to manually edit the json configuration files through ssh, no graphical interface.
 - DSM does not include the needed kernel modules for TProxy (at least on my model), which prevents using ss-redir with udp. Workaround is possible by recompiling the missing modules and iptables.
 - When ss-redir is used, only incoming traffic is redirected (chain PREROUTING). DSM traffic itself is not sent to ss-redir (chain OUTPUT).
-- obfs-plugin is not included for now
 - I am using ss-local, ss-tunnel and ss-redir on my DS214play (evansport architecture) under DSM 6.2, anything else is not tested. Feedback welcome!
 
 # Advanced
