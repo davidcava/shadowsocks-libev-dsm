@@ -4,15 +4,15 @@
 . /pkgscripts/include/pkg_util.sh
 
 package="shadowsocks-libev"
-version="3.2.0-1"
+version="3.2.0-2"
 displayname="Shadowsocks-libev"
 arch="$(pkg_get_platform) "
 maintainer="David Cavallini"
 distributor="davidcava"
 distributor_url="https://github.com/davidcava/"
 support_url="https://github.com/davidcava/shadowsocks-libev-dsm/wiki"
-description="Shadowsocks-libev package for Synology DSM."
-description_fre="Paquet Shadowsocks-libev pour Synology DSM."
+description="Shadowsocks-libev package for Synology DSM, with simple-obfs plugin included."
+description_fre="Paquet Shadowsocks-libev pour Synology DSM, incluant le plugin simple-obfs."
 ctl_stop="yes"
 silent_install="yes"
 silent_upgrade="yes"

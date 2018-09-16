@@ -31,6 +31,9 @@ SetupPackageFiles() {
     cp -L -t $INST_DIR/lib /usr/local/lib/libev.so.4
     cp -L -t $INST_DIR/lib /usr/local/lib/libmbedcrypto.so.1
 
+    echo SynoBuildConf/install: copying simple-obfs plugin files
+    cp -L -t $INST_DIR/bin /usr/local/bin/obfs-*
+
     echo SynoBuildConf/install: Adding DSM specific dirs
     mkdir $INST_DIR/var
     install -D -m 0644 -t $INST_DIR/port_conf synology/port_conf/$PKG_NAME.sc

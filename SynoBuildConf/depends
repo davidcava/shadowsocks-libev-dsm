@@ -1,6 +1,7 @@
 [BuildDependent]
 mbedtls
 libev
+simple-obfs
 
 [default]
 all="6.1"
