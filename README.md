@@ -17,7 +17,6 @@ Additional instances can be started by creating more configuration files: `ss-lo
 - Configuration needs to manually edit the json configuration files through ssh, no graphical interface.
 - DSM does not include the needed kernel modules for TProxy (at least on my model), which prevents using ss-redir with udp. Workaround is possible by recompiling the missing modules and iptables.
 - When ss-redir is used, only incoming traffic is redirected (chain PREROUTING). DSM traffic itself is not sent to ss-redir (chain OUTPUT).
-- obfs-plugin is not included for now
 - I am using ss-local, ss-tunnel and ss-redir on my DS214play (evansport architecture) under DSM 6.2, anything else is not tested. Feedback welcome!
 
 # Advanced
@@ -29,7 +28,7 @@ Example: `/var/packages/shadowsocks-libev/etc/ss-redir-Korea.ipt-rules-exclude`
 -m geoip --dst-cc AD,BG,CY,GI,GR,HU,IS,PL,FI,MT,NO,MC,RS,IM,CZ
 ```
 # Build from source
-- Setup the DSM toolkit for your model according to the official Synology [Developer's guide](https://developer.synology.com/developer-guide/)
+- Setup the DSM toolkit for your model according to the official Synology [Developer's guide](https://originhelp.synology.com/developer-guide/)
 - Download shadowsocks-libev source code into the toolkit
   ```sh
   cd /toolkit/source
@@ -56,6 +55,14 @@ Example: `/var/packages/shadowsocks-libev/etc/ss-redir-Korea.ipt-rules-exclude`
   git clone https://github.com/ARMmbed/mbedtls
   cd mbedtls
   ln -s ../shadowsocks-libev/shadowsocks-libev-dsm/mbedtls/SynoBuildConf .
+  ```
+- Download simple-obfs source into the toolkit and add the DSM build script
+  ```sh
+  cd /toolkit/source
+  git clone https://github.com/shadowsocks/simple-obfs.git
+  cd simple-obfs
+  git submodule update --init --recursive
+  ln -s ../shadowsocks-libev/shadowsocks-libev-dsm/simple-obfs/SynoBuildConf .
   ```
 - Build for your architecture, example
   ```sh
