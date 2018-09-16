@@ -4,7 +4,7 @@
 . /pkgscripts/include/pkg_util.sh
 
 package="shadowsocks-libev"
-version="3.2.0-2"
+version="3.2.0-3"
 displayname="Shadowsocks-libev"
 arch="$(pkg_get_platform) "
 maintainer="David Cavallini"
