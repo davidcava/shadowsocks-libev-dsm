@@ -31,7 +31,7 @@ PID_DIR="$INSTALL_DIR/var"
 CONFIG_DIR="/var/packages/$SYNOPKG_PKGNAME/etc"
 
 # Script directory
-SCRIPT_DIR=$(readlink -f "$(dirname "$0")")
+SCRIPT_DIR=$(readlink -f "$(dirname -- "$0")")
 
 # start-stop-status script redirect stdout/stderr to LOG_FILE
 LOG_FILE="$SYNOPKG_PKGDEST/var/$SYNOPKG_PKGNAME.log"
