@@ -6,6 +6,8 @@ INST_DIR="/tmp/_${PKG_NAME}"
 PKG_DIR="/tmp/_${PKG_NAME}_pkg"
 PKG_DEST="/image/packages"
 
+PKG_DIR_EXPECTED_FILES=13
+
 LANG=C; export LANG
 LC_ALL=C; export LC_ALL
 
@@ -25,11 +27,12 @@ SetupPackageFiles() {
     rm -fr $INST_DIR/include
     rm -fr $INST_DIR/lib
 
-    echo SynoBuildConf/install: creating lib with dependant libraries
-    echo No easy way to find out automatically which library is needed as ldd does not work cross architecture
+    echo SynoBuildConf/install: creating lib with dependant libraries: libev.so.x libmbedcrypto.so.x
     mkdir $INST_DIR/lib
-    cp -L -t $INST_DIR/lib /usr/local/lib/libev.so.4
-    cp -L -t $INST_DIR/lib /usr/local/lib/libmbedcrypto.so.1
+    "$ToolChainSysRoot/usr/bin/ldd" $INST_DIR/bin/ss-local | grep /usr/local/lib | cut -d' ' -f 3 | while read solib
+    do
+        cp -L -t $INST_DIR/lib $solib
+    done
 
     echo SynoBuildConf/install: copying simple-obfs plugin files
     cp -L -t $INST_DIR/bin /usr/local/bin/obfs-*
@@ -48,9 +51,15 @@ SetupPackageFiles() {
 }
 
 MakePackage() {
-    source /pkgscripts/include/pkg_util.sh
+    source /pkgscripts-ng/include/pkg_util.sh
     pkg_make_package $INST_DIR $PKG_DIR
     pkg_make_spk $PKG_DIR $PKG_DEST
+    filesfound=$(find "$PKG_DIR" -type f | wc -l)
+    if [ "$filesfound" != "$PKG_DIR_EXPECTED_FILES" ]
+    then
+	    echo "Number of files packaged = $filesfound, not $PKG_DIR_EXPECTED_FILES as expecting, something must have gone wrong" >>/dev/stderr
+	    exit 1
+    fi
 }
 
 main() {
