@@ -7,9 +7,7 @@ LC_ALL=C; export LC_ALL
 case ${MakeClean} in
     [Yy][Ee][Ss])
         make clean
-        /bin/rm /usr/local/lib/libmbed.*
-        /bin/rm -fr /usr/local/include/mbedtls
-        /bin/rm -fr /usr/local/bin/mbedtls_*
+        make uninstall
         ;;
 esac
 
@@ -19,11 +17,22 @@ case ${CleanOnly} in
         ;;
 esac
 
+# bug with architecture i386 and gcc<6
+DIR=$(dirname "$(readlink -f "${BASH_SOURCE[0]}")")
+patch -N -p0 < "$DIR/bn_mul.h.patch"
+
 export SHARED=1
 # LDFLAGS -s for stripping
-env CC="${CC}" CXX="${CXX}" LD="${LD}" AR=${AR} STRIP=${STRIP} RANLIB=${RANLIB} NM=${NM} \
-    CFLAGS="${CFLAGS}" CXXFLAGS="$CXXFLAGS $CFLAGS" \
-    LDFLAGS="${LDFLAGS} -s" \
-    make ${MAKE_FLAGS}
+LDFLAGS="$LDFLAGS -s"
+
+# For some reason arch 88f6281 does not compile as-is, adding -mthumb solves compilation but is it ok then in runtime?
+# Architecture Marvell Kirkwood 88F6281 = armv5te LE softfp cpu=marvell-f
+if [ "$SYNO_PLATFORM" == MARVELL_88F6281 ]
+then
+    CFLAGS="$CFLAGS -mthumb"
+fi
+
+export CC CXX LD AR STRIP RANLIB NM CFLAGS CXXFLAGS LDFLAGS BUILD_ARCH ARCH
+make ${MAKE_FLAGS} lib
 
 make install

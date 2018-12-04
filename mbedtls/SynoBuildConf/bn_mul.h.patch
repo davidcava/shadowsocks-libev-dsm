@@ -1,0 +1,15 @@
+--- include/mbedtls/bn_mul.h	2018-11-30 22:19:48.800712523 +0800
++++ include/mbedtls/bn_mul_new.h	2018-11-30 22:17:21.073993413 +0800
+@@ -56,7 +56,11 @@
+  * This is done as the number of registers used in the assembly code doesn't
+  * work with the -O0 option.
+  */
+-#if defined(__i386__) && defined(__OPTIMIZE__)
++#if defined(__GNUC__) && __GNUC__ < 5 && defined(__PIC__)
++#define MULADDC_CANNOT_USE_EBX
++#endif
++
++#if defined(__i386__) && defined(__OPTIMIZE__) && !defined(MULADDC_CANNOT_USE_EBX)
+ 
+ #define MULADDC_INIT                        \
+     asm(                                    \
