@@ -6,7 +6,7 @@ INST_DIR="/tmp/_${PKG_NAME}"
 PKG_DIR="/tmp/_${PKG_NAME}_pkg"
 PKG_DEST="/image/packages"
 
-PKG_DIR_EXPECTED_FILES=13
+INST_DIR_EXPECTED_FILES=13
 
 LANG=C; export LANG
 LC_ALL=C; export LC_ALL
@@ -27,12 +27,9 @@ SetupPackageFiles() {
     rm -fr $INST_DIR/include
     rm -fr $INST_DIR/lib
 
-    echo SynoBuildConf/install: creating lib with dependant libraries: libev.so.x libmbedcrypto.so.x
+    echo SynoBuildConf/install: creating lib with dependant libraries: libev.so* libmbedcrypto.so*
     mkdir $INST_DIR/lib
-    "$ToolChainSysRoot/usr/bin/ldd" $INST_DIR/bin/ss-local | grep /usr/local/lib | cut -d' ' -f 3 | while read solib
-    do
-        cp -L -t $INST_DIR/lib $solib
-    done
+    cp -d -t $INST_DIR/lib /usr/local/lib/libev.so* /usr/local/lib/libmbedcrypto.so*
 
     echo SynoBuildConf/install: copying simple-obfs plugin files
     cp -L -t $INST_DIR/bin /usr/local/bin/obfs-*
@@ -48,18 +45,20 @@ SetupPackageFiles() {
     cp -r synology/scripts/ "${PKG_DIR}"
     cp -r synology/conf/ "${PKG_DIR}"
     cp synology/PACKAGE_ICON{,_256}.PNG "${PKG_DIR}"
+
+    echo Checking that the number of files is $INST_DIR_EXPECTED_FILES as expected in $INST_DIR
+    filesfound=$(find "$INST_DIR" -type f | wc -l)
+    if [ "$filesfound" != "$INST_DIR_EXPECTED_FILES" ]
+    then
+       #Log containing "Error" stops the install process
+       echo "Error: Number of files packaged in $INST_DIR = $filesfound, not $INST_DIR_EXPECTED_FILES as expecting, something must have gone wrong"
+    fi
 }
 
 MakePackage() {
     source /pkgscripts-ng/include/pkg_util.sh
     pkg_make_package $INST_DIR $PKG_DIR
     pkg_make_spk $PKG_DIR $PKG_DEST
-    filesfound=$(find "$PKG_DIR" -type f | wc -l)
-    if [ "$filesfound" != "$PKG_DIR_EXPECTED_FILES" ]
-    then
-	    echo "Number of files packaged = $filesfound, not $PKG_DIR_EXPECTED_FILES as expecting, something must have gone wrong" >>/dev/stderr
-	    exit 1
-    fi
 }
 
 main() {
