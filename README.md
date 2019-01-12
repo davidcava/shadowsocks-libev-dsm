@@ -8,6 +8,17 @@ Download the spk for your architecture from the [Release](https://github.com/dav
 After installing the package, create the configuration file(s) into `/var/packages/shadowsocks-libev/etc`.
 Name must be: `ss-local.json` `ss-tunnel.json` `ss-redir.json` `ss-server.json`
 
+No interface is provided to update these configuration files for now.
+So first you need to enable [terminal connection to your Synology](https://www.synology.com/en-global/knowledgebase/DSM/help/DSM/AdminCenter/system_terminal).
+Then either directly connect with a terminal and edit the file(s) with sudo vi:
+```sh
+sudo vi /var/packages/shadowsocks-libev/etc/ss-local.json
+```
+Or create the file on your PC, upload it through DSM FileStation (or scp) then use the terminal to move it to the right location as root:
+```sh
+sudo cp /volume1/admin/ss-local.json /var/packages/shadowsocks-libev/etc
+```
+
 If ss-redir is used, then routing will be activated and the traffic will be routed to ss-redir through iptables. udp will/might not work (see limitation below).
 
 Additional instances can be started by creating more configuration files: `ss-local-xxx.json` `ss-tunnel-xxx.json` etc.
