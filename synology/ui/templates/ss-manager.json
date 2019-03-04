@@ -1,0 +1,12 @@
+{
+	"server":["0.0.0.0","::0"],
+	"port_password": {
+		"8001": "MyPassword1",
+		"8002": "MyPassword2",
+		"8003": "MyPassword3"
+	},
+	"timeout":60,
+	"method":"chacha20-ietf-poly1305",
+	"fast_open": false,
+	"mode": "tcp_and_udp"
+}

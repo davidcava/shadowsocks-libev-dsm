@@ -90,6 +90,8 @@ insert_modules() {
 	insert_module xt_TPROXY
 }
 
+echo Setting up tproxy...
+
 # Activate routing, but not ICMP redirects
 /sbin/sysctl -w -q net.ipv4.ip_forward=1
 /sbin/sysctl -w -q net.ipv4.conf.all.send_redirects=0

@@ -4,15 +4,16 @@
 . /pkgscripts-ng/include/pkg_util.sh
 
 package="shadowsocks-libev"
-version="3.2.3-1"
+version="3.2.4-1"
 displayname="Shadowsocks-libev"
 arch="$(pkg_get_platform) "
 maintainer="David Cavallini"
 distributor="davidcava"
 distributor_url="https://github.com/davidcava/"
 support_url="https://github.com/davidcava/shadowsocks-libev-dsm/wiki"
-description="Shadowsocks-libev package for Synology DSM, with simple-obfs plugin included."
-description_fre="Paquet Shadowsocks-libev pour Synology DSM, incluant le plugin simple-obfs."
+description="Shadowsocks-libev package for Synology DSM, with v2ray plugin included (and also the deprecated simple-obfs)."
+description_fre="Paquet Shadowsocks-libev pour Synology DSM, incluant le plugin v2ray-plugin (et aussi l'ancien simple-obfs)."
+startable="yes"
 ctl_stop="yes"
 silent_install="yes"
 silent_upgrade="yes"
@@ -21,7 +22,7 @@ precheckstartstop="no"
 silent_install="yes"
 silent_upgrade="yes"
 silent_uninstall="yes"
-#dsmuidir="ui"
+dsmuidir="ui"
 dsmappname=SYNO.SDS.Shadowsockslibev.Application
 
 [ "$(caller)" != "0 NULL" ] && return 0

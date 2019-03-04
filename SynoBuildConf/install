@@ -6,7 +6,7 @@ INST_DIR="/tmp/_${PKG_NAME}"
 PKG_DIR="/tmp/_${PKG_NAME}_pkg"
 PKG_DEST="/image/packages"
 
-INST_DIR_EXPECTED_FILES=13
+INST_DIR_EXPECTED_FILES=41
 
 LANG=C; export LANG
 LC_ALL=C; export LC_ALL
@@ -24,8 +24,8 @@ SetupPackageFiles() {
     make install
 
     echo SynoBuildConf/install: removing lib include
-    rm -fr $INST_DIR/include
-    rm -fr $INST_DIR/lib
+    rm -fr ${INST_DIR:?}/include
+    rm -fr ${INST_DIR:?}/lib
 
     echo SynoBuildConf/install: creating lib with dependant libraries: libev.so* libmbedcrypto.so*
     mkdir $INST_DIR/lib
@@ -33,6 +33,49 @@ SetupPackageFiles() {
 
     echo SynoBuildConf/install: copying simple-obfs plugin files
     cp -L -t $INST_DIR/bin /usr/local/bin/obfs-*
+
+    echo SynoBuildConf/install: copying v2ray-plugin plugin files
+    
+    local v2rayarch
+    if [ "$PLATFORM_FAMILY" = "SYNOPLAT_F_I686" ]; then
+        v2rayarch="386"
+    elif [ "$PLATFORM_FAMILY" = "SYNOPLAT_F_X86_64" ]; then
+       v2rayarch="amd64"
+    elif [ "$PLATFORM_FAMILY" = "SYNOPLAT_F_ARMV5" ]; then
+       v2rayarch="arm5"
+    elif [ "$PLATFORM_FAMILY" = "SYNOPLAT_F_ARMV7" ]; then
+       v2rayarch="arm7"
+    elif [ "$PLATFORM_FAMILY" = "SYNOPLAT_F_PPC" ] || [ "$PLATFORM_FAMILY" = "SYNOPLAT_F_ARMV8" ]; then
+       echo "WARNING! No v2ray-plugin for $PLATFORM_FAMILY"
+       v2rayarch="none"
+       INST_DIR_EXPECTED_FILES=$((INST_DIR_EXPECTED_FILES-1))
+    else
+       echo "WARNING! Platform family unknown $PLATFORM_FAMILY - not installing v2ray-plugin"
+       v2rayarch="none"
+    fi
+
+    if [ "$v2rayarch" != "none" ]; then
+       cp synology/v2ray-plugin/v2ray-plugin_linux_$v2rayarch $INST_DIR/bin/v2ray-plugin
+    fi
+
+#    if [ "$v2rayarch" != "none" ]; then
+#       cp synology/v2ray-plugin/v2ray-plugin_linux_$v2rayarch $INST_DIR/bin/v2ray-plugin
+#    fi
+
+#    if [ "$v2rayarch" != "none" ]; then
+#      if [ ! -f /usr/local/bin/v2ray-plugin_$V2RVERSION ]; then
+#         wget --no-check-certificate -O - "https://github.com/shadowsocks/v2ray-plugin/releases/download/v$V2RVERSION/v2ray-plugin-linux-$v2rayarch-v$V2RVERSION.tar.gz" | tar -xzC /usr/local/bin && mv /usr/local/bin/v2ray-plugin_linux_$v2rayarch /usr/local/bin/v2ray-plugin_$V2RVERSION
+#      fi
+#      cp /usr/local/bin/v2ray-plugin_$V2RVERSION $INST_DIR/bin/v2ray-plugin
+#    fi
+
+    mkdir $INST_DIR/ui
+    install -D -m 0755 -t $INST_DIR/ui synology/ui/*.cgi synology/ui/*.php
+    install -D -m 0644 -t $INST_DIR/ui synology/ui/config
+    mkdir $INST_DIR/ui/images
+    install -D -m 0644 -t $INST_DIR/ui/images synology/ui/images/*
+    mkdir $INST_DIR/ui/templates
+    install -D -m 0644 -t $INST_DIR/ui/templates synology/ui/templates/*
 
     echo SynoBuildConf/install: Adding DSM specific dirs
     mkdir $INST_DIR/var

@@ -60,6 +60,8 @@ insert_modules() {
 	/usr/syno/bin/synomoduletool --insmod Shadowsocks x_tables.ko ip_tables.ko iptable_filter.ko nf_conntrack.ko nf_defrag_ipv4.ko nf_conntrack_ipv4.ko nf_nat.ko iptable_nat.ko ipt_REDIRECT.ko xt_multiport.ko xt_tcpudp.ko xt_state.ko ipt_MASQUERADE.ko
 }
 
+echo Setting up redirect...
+
 # Activate routing, but not ICMP redirects
 /sbin/sysctl -w -q net.ipv4.ip_forward=1
 /sbin/sysctl -w -q net.ipv4.conf.all.send_redirects=0

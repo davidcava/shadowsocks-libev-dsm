@@ -1,0 +1,12 @@
+{
+  "server": "xx.xx.xx.xx",
+  "server_port": 4444,
+  "local_address": "0.0.0.0",
+  "local_port": 5555,
+  "password": "MyPassword",
+  "method": "chacha20-ietf-poly1305",
+  "fast_open": false,
+  "tunnel_address": "8.8.8.8:53",
+  "timeout": 10,
+  "mode": "tcp_and_udp"
+}

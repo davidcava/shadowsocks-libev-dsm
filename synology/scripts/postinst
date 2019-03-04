@@ -22,6 +22,11 @@ if [ -r "${SVC_SETUP}" ]; then
     . "${SVC_SETUP}"
 fi
 
+echo "\$config_dir = '$CONFIG_DIR';" >> "$SYNOPKG_PKGDEST/ui/synoenv.php"
+echo "\$script_dir = '$SCRIPT_DIR';" >> "$SYNOPKG_PKGDEST/ui/synoenv.php"
+
+sed -i -e "s,^SYNOPKG_PKGNAME=\${SYNOPKG_PKGNAME:-}$,SYNOPKG_PKGNAME=\${SYNOPKG_PKGNAME:-$SYNOPKG_PKGNAME}," -e "s,^SYNOPKG_PKGDEST=\${SYNOPKG_PKGDEST:-},SYNOPKG_PKGDEST=\${SYNOPKG_PKGDEST:-$SYNOPKG_PKGDEST}," $SVC_SETUP
+
 conf_files=$(find -L "$CONFIG_DIR" -maxdepth 1 -regextype posix-extended -regex "$CONFFILES_REGEX" -type f -printf '%f ')
 if [ -z "$conf_files" ]
 then

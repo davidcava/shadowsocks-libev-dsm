@@ -1,0 +1,17 @@
+{
+	".url": {
+		"SYNO.SDS.ShadowsocksLibev.Application": {
+			"type": "legacy",
+			"allUsers": false,
+			"allowMultiInstance": false,
+			"title": "shadowsocks-libev",
+			"desc": "Shadowsocks-libev",
+			"icon": "images/ss{0}.png",
+			"appWindow": "SYNO.SDS.ShadowsocksLibev.Application",
+			"texts": "texts",
+			"width": 640,
+			"height": 500,
+			"url": "/webman/3rdparty/shadowsocks-libev/index.cgi"
+		}
+	}
+}

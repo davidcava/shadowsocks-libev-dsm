@@ -13,12 +13,19 @@ SCRIPT_TPROXY="$SCRIPT_DIR/tproxy.sh"
 
 start_daemon ()
 {
+	local sourcefiles
+	if [ "$1" = "" ]; then
+		sourcefiles="$CONFIG_DIR" # normal launch: start everything in the folder
+	else
+		sourcefiles="$1" # unit launch: only 1 file
+	fi
+
     local CONF_FILE started retcode tcpredir udpredir
     started=0
     tcpredir=0
     udpredir=0
 
-    #Look for any ss-<ssserver>-<name>.json config files in configuration etc folder, and optionaly ss-server-name.params
+    #Look for any ss-<ssserver>-<name>.json config files in configuration etc folder, and optionaly ss-<ssserver>-<name>.params
     while read -r CONF_FILE
     do
         local SS_SERVER CONF_NAME PID_FILE PARAMS CMD
@@ -79,14 +86,14 @@ start_daemon ()
                 udpredir=1
             fi
         fi
-    done < <( find -L "$CONFIG_DIR" -maxdepth 1 -regextype posix-extended -regex "$CONFFILES_REGEX" -type f )
+    done < <( find -L "$sourcefiles" -maxdepth 1 -regextype posix-extended -regex "$CONFFILES_REGEX" -type f )
 
     if [ "$started" = 1 ]
     then
         # At least 1 daemon could start, update the used ports toward DSM if needed
         "$SCRIPT_DIR/gensc.sh"
     else
-        echo 'Nothing started: check config file(s) ss-(local|server|redir|tunnel)[-confname].json in: '"$CONFIG_DIR" >> "$SYNOPKG_TEMP_LOGFILE"
+        echo 'Nothing started: check config file(s) ss-(local|server|redir|tunnel|manager)[-confname].json in: '"$CONFIG_DIR" >> "$SYNOPKG_TEMP_LOGFILE"
         exit 1
     fi
 
@@ -111,35 +118,52 @@ stop_daemon ()
 {
     local PID_FILE
 
+	local sourcefiles
+	if [ "$1" = "" ]; then
+		sourcefiles="$PID_DIR" # normal launch: stop everything in the folder
+	else
+		sourcefiles="$PID_DIR/$1.pid" # unit stop: only 1 file
+	fi
+
     while read -r PID_FILE
     do
-        kill "$(cat "$PID_FILE")"
-        wait_for_death 20 "$(cat "$PID_FILE")" || kill -9 "$(cat "$PID_FILE")"
-        rm -f "$PID_FILE"
-    done < <( find -L "${PID_DIR}" -maxdepth 1 -regextype posix-extended -regex '.*/'"$PIDFILES_REGEX" -type f )
-   
+		kill "$(cat "$PID_FILE")"
+		wait_for_death 20 "$(cat "$PID_FILE")" || kill -9 "$(cat "$PID_FILE")"
+		rm -f "$PID_FILE"
+    done < <( find -L "$sourcefiles" -maxdepth 1 -regextype posix-extended -regex '.*/'"$PIDFILES_REGEX" -type f )
+}
+
+daemon_status_unit ()
+{
+    local CONF_FILE SS_SERVER CONF_NAME PID_FILE
+
+    CONF_FILE="$1"
+	SS_SERVER=$(echo "$CONF_FILE" | sed -E 's,'"$CONFFILES_REGEX"',\2,')
+	CONF_NAME=$(echo "$CONF_FILE" | sed -E 's,'"$CONFFILES_REGEX"',\4,')
+
+	PID_FILE="$PID_DIR/$SS_SERVER${CONF_NAME:+-$CONF_NAME}.pid"
+
+	if [ -f "$PID_FILE" ] && kill -0 "$(cat "$PID_FILE")" > /dev/null 2>&1; then
+		[ -n "$2" ] || echo "  $SS_SERVER $CONF_NAME is running"
+		return 0
+	else
+		[ -n "$2" ] || echo "  $SS_SERVER $CONF_NAME is not running"
+		rm -f "$PID_FILE"
+		return 1	
+	fi
 }
 
 # Status is True if at least 1 ss-<server> is running, False if none is running
-# Quiet if called with a parameter 0 
+# Quiet if called with first parameter = 0 
 daemon_status ()
 {
-    local stopped CONF_FILE SS_SERVER CONF_NAME PID_FILE
+    local stopped CONF_FILE
     stopped=1
 
     while read -r CONF_FILE
     do
-        SS_SERVER=$(echo "$CONF_FILE" | sed -E 's,'"$CONFFILES_REGEX"',\2,')
-        CONF_NAME=$(echo "$CONF_FILE" | sed -E 's,'"$CONFFILES_REGEX"',\4,')
-
-        PID_FILE="$PID_DIR/$SS_SERVER${CONF_NAME:+-$CONF_NAME}.pid"
-
-        if [ -f "$PID_FILE" ] && kill -0 "$(cat "$PID_FILE")" > /dev/null 2>&1; then
-            [ -n "$1" ] || echo "  $SS_SERVER $CONF_NAME is running"
+        if daemon_status_unit "$CONF_FILE" "$1"; then
             stopped=0
-        else
-            [ -n "$1" ] || echo "  $SS_SERVER $CONF_NAME is not running"
-            rm -f "$PID_FILE"
         fi
     done < <( find -L "${CONFIG_DIR}" -maxdepth 1 -regextype posix-extended -regex '.*/'"$CONFFILES_REGEX" -type f )
 
@@ -152,10 +176,16 @@ wait_for_death ()
     local daemonpid=$2
     while [ "${counter}" -gt 0 ]; do
         kill -0 "$daemonpid" > /dev/null 2>&1 || return 0
-        let counter=counter-1
+	counter=$((counter-1))
         sleep 1
     done
     return 1
+}
+
+setvars_unit_file ()
+{
+	UNIT_SERVER=$(basename "$1" .json)
+	UNIT_FILE="$CONFIG_DIR/$UNIT_SERVER.json"
 }
 
 # script is run from unexisting home directory of homeless user, which bugs some functions, so go to /tmp instead
@@ -164,29 +194,57 @@ cd "${TMPDIR-/tmp}"
 
 case $1 in
     start)
-        if daemon_status 0; then
-            echo "${DNAME} is already running (at least 1 server is)"
-        else
-            echo "Starting ${DNAME} ..."
-            start_daemon
-        fi
-        ;;
+		if [ "$2" = "" ]; then
+			echo "Starting $DNAME ..."
+			start_daemon
+		else
+			setvars_unit_file "$2"
+			if [ ! -f "$UNIT_FILE" ]; then
+				echo "$UNIT_FILE not found"
+				exit 1
+			elif daemon_status_unit "$UNIT_FILE" 0; then
+				echo "$DNAME $UNIT_SERVER is already running"
+			else
+				echo "Starting $DNAME $UNIT_SERVER ..."
+				start_daemon "$UNIT_FILE"
+			fi
+		fi
+		;;
     stop)
-        if daemon_status 0; then
-            echo "Stopping ${DNAME} ..."
-            stop_daemon
-        else
-            echo "${DNAME} is not running"
-        fi
+		if [ "$2" = "" ]; then
+			if daemon_status 0; then
+				echo "Stopping $DNAME ..."
+				stop_daemon
+			else
+				echo "$DNAME is not running"
+			fi
+		else
+			setvars_unit_file "$2"
+			if daemon_status_unit "$UNIT_FILE" 0; then
+				echo "Stopping $DNAME $UNIT_SERVER ..."
+				stop_daemon "$UNIT_SERVER"
+			else
+				echo "$DNAME $UNIT_SERVER is not running"
+			fi
+		fi
         ;;
     status)
-        if daemon_status; then
-            exit 0
-        else
-            echo "${DNAME} is not running"
-            exit 3
-        fi
-        ;;
+		if [ "$2" = "" ]; then
+			if daemon_status; then
+				exit 0
+			else
+				echo "$DNAME is not running"
+				exit 3
+			fi
+		else
+			setvars_unit_file "$2"
+			if daemon_status_unit "$UNIT_FILE"; then
+				exit 0
+			else
+				exit 3
+			fi
+		fi
+		;;
     log)
         echo "${LOG_FILE}"
         ;;

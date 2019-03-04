@@ -15,6 +15,30 @@
         "run-as": "root"
     }
     ]
-
+,
+  "executable": [
+   {
+    "relpath": "ui/index.cgi",
+    "run-as": "system"
+   },{
+    "relpath": "ui/getfilelist.cgi",
+    "run-as": "system"
+   },{
+    "relpath": "ui/getfile.cgi",
+    "run-as": "system"
+   },{
+    "relpath": "ui/status.cgi",
+    "run-as": "system"
+   },{
+    "relpath": "ui/writefile.cgi",
+    "run-as": "root"
+   },{
+    "relpath": "ui/deletefile.cgi",
+    "run-as": "root"
+   },{
+    "relpath": "ui/startstop.cgi",
+    "run-as": "root"
+   }
+  ]
 }
 

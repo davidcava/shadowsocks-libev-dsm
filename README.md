@@ -1,37 +1,32 @@
 # shadowsocks-libev-dsm
- Synology DSM packages for Shadowsocks-libev.
+ Synology DSM packages for Shadowsocks-libev, with v2ray plugin.
+ Graphical interface to set-up the configuration files and start/stop the service(s) (experimental).
  
+![Screenshot](shadowsocks-libev-dsm-screenshot.png)
+
 # Installation
 Download the spk for your architecture from the [Release](https://github.com/davidcava/shadowsocks-libev-dsm/releases) section, then install using Synology Package Center button _Manual Install_. See  architectures on [Synology knowledge base](https://www.synology.com/en-us/knowledgebase/DSM/tutorial/General/What_kind_of_CPU_does_my_NAS_have).
 
 # Usage
-After installing the package, create the configuration file(s) into `/var/packages/shadowsocks-libev/etc`.
-Name must be: `ss-local.json` `ss-tunnel.json` `ss-redir.json` `ss-server.json`
+After installing the package, create configuration files and start the service(s). Services will restart automatically in case of reboot or restart from the Package Center.
 
-No interface is provided to update these configuration files for now.
-So first you need to enable [terminal connection to your Synology](https://www.synology.com/en-global/knowledgebase/DSM/help/DSM/AdminCenter/system_terminal).
-Then either directly connect with a terminal and edit the file(s) with sudo vi:
-```sh
-sudo vi /var/packages/shadowsocks-libev/etc/ss-local.json
-```
-Or create the file on your PC, upload it through DSM FileStation (or scp) then use the terminal to move it to the right location as root:
-```sh
-sudo cp /volume1/admin/ss-local.json /var/packages/shadowsocks-libev/etc
-```
+Note: configuration file(s) are stored into `/var/packages/shadowsocks-libev/etc`.
+Names must be: `ss-local.json` `ss-tunnel.json` `ss-redir.json` `ss-server.json` `ss-manager.json`
+Additional instances can be created with names: `ss-local-xxx.json` `ss-tunnel-xxx.json` etc.
 
-If ss-redir is used, then routing will be activated and the traffic will be routed to ss-redir through iptables. udp will/might not work (see limitation below).
-
-Additional instances can be started by creating more configuration files: `ss-local-xxx.json` `ss-tunnel-xxx.json` etc.
+If ss-redir is used, then routing will be activated. The incoming non-local traffic will be routed to ss-redir through iptables. udp will/might not work (see limitation below).
 
 # Limitation
 - Only works on DSM 6.1 and 6.2
-- Configuration needs to manually edit the json configuration files through ssh, no graphical interface.
+- I don't know how to compile v2ray-plugin using Synology's dev environment so I just copy the binaries provided in the project. Not really sure which one goes into which architecture so probably not working for all. If not working, just drop the v2ray-plugin executable into /var/packages/shadowsocks-libev/target/bin (and tell me what works for you).
+- Graphical interface is still experimental: it works well on my model but might not on others. Use SSH and edit config files manually if any issue.
+- Graphical interface does not allow to view the logs.
 - DSM does not include the needed kernel modules for TProxy (at least on my model), which prevents using ss-redir with udp. Workaround is possible by recompiling the missing modules and iptables.
 - When ss-redir is used, only incoming traffic is redirected (chain PREROUTING). DSM traffic itself is not sent to ss-redir (chain OUTPUT).
 - I am using ss-local, ss-tunnel and ss-redir on my DS214play (evansport architecture) under DSM 6.2, anything else is not tested. Feedback welcome!
 
 # Advanced
-- It is possible to control which traffic goes to which ss-redir-xxx by putting iptables directives into files `ss-redir-xxx.ipt-rules-exclude` and/or `ss-redir-xxx.ipt-rules-include`. Packets matching the iptables rules within those files are excluded and/or included from being redirected.
+- It is possible to control which traffic goes to which ss-redir-xxx by putting iptables directives into files `ss-redir-xxx.ipt-rules-exclude` and/or `ss-redir-xxx.ipt-rules-include`. Packets matching the iptables rules within those files are excluded and/or included from being redirected. Those files cannot be created with the graphical interface.
 
 Example: `/var/packages/shadowsocks-libev/etc/ss-redir-Korea.ipt-rules-exclude`
 ```sh
@@ -82,7 +77,7 @@ Example: `/var/packages/shadowsocks-libev/etc/ss-redir-Korea.ipt-rules-exclude`
 - If everything went fine, package is now in `/toolkit/result_spk`
 
 # Licence
-    Copyright (c) 2018 David Cavallini
+    Copyright (c) 2018 2019 David Cavallini
 
     shadowsocks-libev-dsm is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by

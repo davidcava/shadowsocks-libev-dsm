@@ -1,15 +1,17 @@
 #!/bin/sh
 
+# Those 2 lines are replaced during the installation with proper values
+SYNOPKG_PKGNAME=${SYNOPKG_PKGNAME:-}
+SYNOPKG_PKGDEST=${SYNOPKG_PKGDEST:-}
+
+# We should never enter this as the 2 previous lines set default values
 if [ "$SYNOPKG_PKGNAME" = "" ] || [ "$SYNOPKG_PKGDEST" = "" ]; then
-    echo "Environment variables SYNOPKG_xxx are not set, are we launched by DSM?" >> /dev/stderr
-    echo "If debugging scripts directly execute first: . ./setsynovars.debug" >> /dev/stderr
+    echo "Environment variables SYNOPKG_xxx are not set, that should never happen." >> /dev/stderr
     exit 1
 fi
 
-if [ "$SYNOPKG_TEMP_LOGFILE" = "" ]; then
-    # DSM does not always set SYNOPKG_TEMP_LOGFILE as it should
-    SYNOPKG_TEMP_LOGFILE=/dev/stderr
-fi
+# DSM does not always set SYNOPKG_TEMP_LOGFILE as it should
+SYNOPKG_TEMP_LOGFILE=${SYNOPKG_TEMP_LOGFILE:-/dev/stderr}
 
 export SYNOPKG_PKGNAME
 export SYNOPKG_PKGDEST
@@ -37,8 +39,8 @@ SCRIPT_DIR=$(readlink -f "$(dirname -- "$0")")
 LOG_FILE="$SYNOPKG_PKGDEST/var/$SYNOPKG_PKGNAME.log"
 
 # Those evnt variables impact regex matching
-export LANG=C
-export LC_ALL=C
+LANG=en_US.utf8
+LC_ALL=en_US.utf8
 
 export LD_LIBRARY_PATH="$INSTALL_DIR/lib"
 export PATH="$INSTALL_DIR/bin:$PATH"
@@ -49,7 +51,7 @@ IPT=/sbin/iptables
 # iptables that supports TProxy
 INSTALL_DIR_IPT2="/var/packages/iptables/target"
 
-# Regular expression for filenames of the configuration files, matching like: <path>/ss-local-Korea.json
-CONFFILES_REGEX='(.+/)(ss-local|ss-server|ss-redir|ss-tunnel)(-([a-zA-Z0-9]*))?.json$'
-PIDFILES_REGEX='(.+/)(ss-local|ss-server|ss-redir|ss-tunnel)(-([a-zA-Z0-9]*))?.pid$'
+# (extended) regular expression for filenames of the configuration files, matching like: <path>/ss-local-Korea.json
+CONFFILES_REGEX='(.+/)(ss-local|ss-server|ss-redir|ss-tunnel|ss-manager)(-([[:alnum:]]*))?.json$'
+PIDFILES_REGEX='(.+/)(ss-local|ss-server|ss-redir|ss-tunnel|ss-manager)(-([[:alnum:]]*))?.pid$'
 

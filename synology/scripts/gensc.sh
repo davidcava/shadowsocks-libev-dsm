@@ -11,6 +11,12 @@ fi
 PORT_SC_FILE="$INSTALL_DIR/port_conf/shadowsocks-libev.sc"
 PORT_SC_FILE_TMP="$INSTALL_DIR/port_conf/shadowsocks-libev.tmp"
 
+# jq compiled without regex :-( so cannot use test() to filter the regex directly within jq so use grep instead
+REGEX_LOOPBACK='^(127(\.[[:digit:]]+){1,3}|[0:]+1|localhost)$'
+
+# jq filter to handle both single and multiple adresses
+JQ_FILTER='(scalars,.[]?)'
+
 gensc ()
 {
     local CONF_FILE
@@ -43,29 +49,34 @@ gensc ()
 
         local title=""
         local ip=""
-        local port=""
+        local ports=""
         case "$SS_SERVER" in
             ss-local)
-                ip=$(jq -r '.local_ip' "$CONF_FILE")
-                port=$(jq -r '.local_port' "$CONF_FILE")
+                ip=$(jq -r ".local_address | $JQ_FILTER" "$CONF_FILE" | grep -E -i -v "$REGEX_LOOPBACK")
+                ports=$(jq -r '.local_port' "$CONF_FILE")
                 title="Proxy SOCKS"
                 ;;
             ss-redir)
-                ip=$(jq -r '.local_ip' "$CONF_FILE")
-                port=$(jq -r '.local_port' "$CONF_FILE")
+                ip=$(jq -r ".local_address | $JQ_FILTER" "$CONF_FILE" | grep -E -i -v "$REGEX_LOOPBACK")
+                ports=$(jq -r '.local_port' "$CONF_FILE")
                 title="Redir port"
                 ;;
             ss-tunnel)
-                ip=$(jq -r '.local_ip' "$CONF_FILE")
-                port=$(jq -r '.local_port' "$CONF_FILE")
+                ip=$(jq -r ".local_address | $JQ_FILTER" "$CONF_FILE" | grep -E -i -v "$REGEX_LOOPBACK")
+                ports=$(jq -r '.local_port' "$CONF_FILE")
                 local tunnel_address
                 tunnel_address=$(jq -r '.tunnel_address' "$CONF_FILE")
                 title="Tunnel to $tunnel_address"
                 ;;
             ss-server)
-                ip=$(jq -r '.server_ip' "$CONF_FILE")
-                port=$(jq -r '.server_port' "$CONF_FILE")
+                ip=$(jq -r ".server | $JQ_FILTER" "$CONF_FILE" | grep -E -i -v "$REGEX_LOOPBACK")
+                ports=$(jq -r '.server_port' "$CONF_FILE")
                 title="SS server"
+                ;;
+            ss-manager)
+                ip=$(jq -r ".server | $JQ_FILTER" "$CONF_FILE" | grep -E -i -v "$REGEX_LOOPBACK")
+                ports=$(jq -r '.port_password | try keys[]' "$CONF_FILE")
+                title="SS manager"
                 ;;
         esac
 
@@ -78,22 +89,33 @@ gensc ()
             tcpudp="udp"
         fi
 
-        # test for loopback addr is not reliable but at least most common way of writing the loopback are excluded from forward
         local port_forward
-        if [[ ( "$SS_SERVER" = "ss-local" || "$SS_SERVER" = "ss-server" || "$SS_SERVER" = "ss-tunnel" ) && "$ip" != "127.0.0.1" && "$ip" != "::1" ]]; then
+	if [[ ( "$SS_SERVER" = "ss-local" || "$SS_SERVER" = "ss-server" || "$SS_SERVER" = "ss-tunnel" || "$SS_SERVER" = "ss-manager" ) && -n "$ip" ]]; then
             port_forward="yes"
         else
             port_forward="no"
         fi
 
+	local port=""
+	local commaports=""
+	for port in $ports ; do
+		if [ -z "$commaports" ]; then
+			commaports="$port"
+		else
+			commaports="$commaports,$port"
+		fi
+	done
+
+	if [ -n "$commaports" ]; then
         cat <<-EOF
 		[shadowsocks-libev_$SS_SERVER${CONF_NAME:+-$CONF_NAME}]
 		title="$title"
 		desc="shadowsocks-libev${CONF_NAME:+ $CONF_NAME}"
 		port_forward="$port_forward"
-		dst.ports="$port/$tcpudp"
+		dst.ports="$commaports/$tcpudp"
 
 	EOF
+	fi
 
     done < <( find -L "$CONFIG_DIR" -maxdepth 1 -regextype posix-extended -regex "$CONFFILES_REGEX" -type f )
 
@@ -102,7 +124,7 @@ gensc ()
 gensc > "$PORT_SC_FILE_TMP"
 
 if diff -q -b -B "$PORT_SC_FILE" "$PORT_SC_FILE_TMP" >>/dev/null; then
-    echo No change!
+    echo Ports: no change!
     rm "$PORT_SC_FILE_TMP"
 else
     echo -n Port changes
