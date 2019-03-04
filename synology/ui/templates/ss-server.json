@@ -1,9 +1,9 @@
 {
-	"server":["0.0.0.0","::0"],
+	"server":"0.0.0.0",
 	"server_port":1995,
 	"password":"MyPassword",
 	"timeout":60,
 	"method":"chacha20-ietf-poly1305",
 	"fast_open": false,
-	"mode": "tcp_and_udp"
+	"mode": "tcp_only"
 }

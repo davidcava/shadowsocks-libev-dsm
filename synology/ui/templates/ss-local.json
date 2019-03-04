@@ -7,5 +7,5 @@
   "timeout": 60,
   "method": "chacha20-ietf-poly1305",
   "fast_open": false,
-  "mode": "tcp_and_udp"
+  "mode": "tcp_only"
 }
