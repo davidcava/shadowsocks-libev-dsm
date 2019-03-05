@@ -20,6 +20,11 @@ if [ -r "${SVC_SETUP}" ]; then
 	. "${SVC_SETUP}"
 fi
 
+if [ ! -d "$CONFIG_DIR" ]; then
+	echo "Config directory $CONFIG_DIR not found"
+	exit 1
+fi
+
 TABLE=nat
 TCPUDP=tcp
 
