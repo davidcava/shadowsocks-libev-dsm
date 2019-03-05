@@ -19,9 +19,6 @@ silent_install="yes"
 silent_upgrade="yes"
 silent_uninstall="yes"
 precheckstartstop="no"
-silent_install="yes"
-silent_upgrade="yes"
-silent_uninstall="yes"
 dsmuidir="ui"
 dsmappname=SYNO.SDS.Shadowsockslibev.Application
 
