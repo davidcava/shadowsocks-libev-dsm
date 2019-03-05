@@ -8,6 +8,11 @@ if [ -r "${SVC_SETUP}" ]; then
     . "${SVC_SETUP}"
 fi
 
+if [ ! -d "$CONFIG_DIR" ] || [ ! -d "$INSTALL_DIR" ]; then
+	echo "Config directory $CONFIG_DIR or Install dir $INSTALL_DIR not found"
+	exit 1
+fi
+
 PORT_SC_FILE="$INSTALL_DIR/port_conf/shadowsocks-libev.sc"
 PORT_SC_FILE_TMP="$INSTALL_DIR/port_conf/shadowsocks-libev.tmp"
 
