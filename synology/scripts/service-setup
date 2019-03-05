@@ -1,8 +1,8 @@
 #!/bin/sh
 
-# Those 2 lines are replaced during the installation with proper values
-SYNOPKG_PKGNAME=${SYNOPKG_PKGNAME:-}
-SYNOPKG_PKGDEST=${SYNOPKG_PKGDEST:-}
+# Those env variables are provided when DSM calls scripts but are missing if called manually
+SYNOPKG_PKGNAME=${SYNOPKG_PKGNAME:-shadowsocks-libev}
+SYNOPKG_PKGDEST=${SYNOPKG_PKGDEST:-/var/packages/shadowsocks-libev/target}
 
 # We should never enter this as the 2 previous lines set default values
 if [ "$SYNOPKG_PKGNAME" = "" ] || [ "$SYNOPKG_PKGDEST" = "" ]; then
