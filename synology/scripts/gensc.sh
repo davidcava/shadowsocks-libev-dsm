@@ -115,7 +115,7 @@ gensc ()
         cat <<-EOF
 		[shadowsocks-libev_$SS_SERVER${CONF_NAME:+-$CONF_NAME}]
 		title="$title"
-		desc="shadowsocks-libev${CONF_NAME:+ $CONF_NAME}"
+		desc="${SS_SERVER}${CONF_NAME:+ $CONF_NAME}"
 		port_forward="$port_forward"
 		dst.ports="$commaports/$tcpudp"
 
