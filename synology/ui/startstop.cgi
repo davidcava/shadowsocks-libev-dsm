@@ -13,6 +13,6 @@ if (preg_match('/^(ss-local|ss-server|ss-redir|ss-tunnel|ss-manager|v2ray)(-[[:a
 } elseif ($action != 'start' && $action != 'stop') {
 	echo "Invalid action: $action";
 } else {
-	system($script_dir . "/start-stop-status $action $matches[1] 2>/dev/null", $return_var);
+	system($script_dir . "/start-stop-status $action $filename 2>/dev/null", $return_var);
 	echo "result=$return_var\n";
 }
