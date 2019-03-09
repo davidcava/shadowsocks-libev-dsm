@@ -102,7 +102,7 @@ Ext.onReady(function() {
 				callback: function(options,success,responseObject) {
 					var resp = responseObject.responseText;
 					if (success && resp.endsWith('result=0\n')) {
-						Ext.Msg.show({title: action + ' successful',msg: action + ' log:<PRE>' + resp.substr(0,resp.lastIndexOf('result=')-1) + '</PRE>',buttons: Ext.Msg.OK, icon: Ext.Msg.INFO});
+						Ext.Msg.show({title: action + ' result',msg: action + ' log:<PRE>' + resp.substr(0,resp.lastIndexOf('result=')-1) + '</PRE>',buttons: Ext.Msg.OK, icon: Ext.Msg.INFO});
 					} else {
 						Ext.Msg.show({title: action + ' failed',msg: action + ' log:<PRE>' + resp + '</PRE>',buttons: Ext.Msg.OK,icon: Ext.Msg.ERROR});
 					}
@@ -208,7 +208,7 @@ Ext.onReady(function() {
 							method: 'GET',
 							callback: function(options,success,responseObject) {
 								if (responseObject.responseText=="ok\n") {
-									Ext.Msg.show({title: 'Status',msg: 'Config file is now deleted:' + filename,buttons: Ext.Msg.OK, icon: Ext.Msg.INFO});
+									//Ext.Msg.show({title: 'Status',msg: 'Config file is now deleted:' + filename,buttons: Ext.Msg.OK, icon: Ext.Msg.INFO});
 									node.remove(true);
 								} else if (responseObject.responseText=="file not found\n") {
 									node.remove(true); // delete a node just created
