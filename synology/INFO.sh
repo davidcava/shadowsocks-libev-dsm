@@ -4,7 +4,7 @@
 . /pkgscripts-ng/include/pkg_util.sh
 
 package="shadowsocks-libev"
-version="3.2.4-2"
+version="3.2.4-3"
 displayname="Shadowsocks-libev"
 arch="$(pkg_get_platform) "
 maintainer="David Cavallini"
