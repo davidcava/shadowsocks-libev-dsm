@@ -44,7 +44,7 @@ Example: `/var/packages/shadowsocks-libev/etc/ss-redir-Korea.ipt-rules-exclude`
   ```
 - Add or link the 2 subfolders `synology` and `SynoBuildConf` from `shadowsocks-libev-dsm` into the shadowsocks-libev source folder
   ```sh
-  git clone https://github.com/shadowsocks/shadowsocks-libev-dsm.git
+  git clone https://github.com/davidcava/shadowsocks-libev-dsm.git
   ln -s ./shadowsocks-libev-dsm/SynoBuildConf ./shadowsocks-libev-dsm/synology .
   ```
 - Download libev source into the toolkit and add the DSM build script
