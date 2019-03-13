@@ -1,5 +1,6 @@
-#!/bin/bash
+#!/bin/sh
 # checked with: shellcheck -x gensc.sh
+# shellcheck disable=SC2039
 
 # Source package specific variable and functions
 SVC_SETUP="$(dirname "$0")/service-setup"
@@ -30,7 +31,7 @@ gensc ()
     echo
 
     #Look for any ss-<ssserver>-<name>.json config files in configuration etc folder
-    while read -r CONF_FILE
+    find -L "$CONFIG_DIR" -maxdepth 1 -regextype posix-extended -regex "$CONFFILES_REGEX" -type f | while IFS= read -r CONF_FILE
     do
         local SS_SERVER CONF_NAME CMD
         SS_SERVER=$(echo "$CONF_FILE" | sed -E 's,'"$CONFFILES_REGEX"',\2,')
@@ -39,14 +40,14 @@ gensc ()
 
         local tcpmode
         grep -E -q 'udp_only' -- "$CONF_FILE"
-        if grep -E -q 'udp_only' -- "$CONF_FILE" || [[ -z "${CMD##* -U*}" ]]; then
+        if grep -E -q 'udp_only' -- "$CONF_FILE" || [ -z "${CMD##* -U*}" ]; then
             tcpmode=0
         else
             tcpmode=1
         fi
 
         local udpmode
-        if grep -E -q 'tcp_and_udp|udp_only' -- "$CONF_FILE" || [[ -z "${CMD##* -u*}" || -z "${CMD##* -U*}" ]]; then
+        if grep -E -q 'tcp_and_udp|udp_only' -- "$CONF_FILE" || [ -z "${CMD##* -u*}" ] || [ -z "${CMD##* -U*}" ]; then
             udpmode=1
         else
             udpmode=0
@@ -86,16 +87,16 @@ gensc ()
         esac
 
         local tcpudp=""
-        if [[ "$tcpmode" = 1 && "$udpmode" = 1 ]]; then
+        if [ "$tcpmode" = "1" ] && [ "$udpmode" = "1" ]; then
             tcpudp="tcp,udp"
-        elif [[ "$tcpmode" = 1 ]]; then
+        elif [ "$tcpmode" = "1" ]; then
             tcpudp="tcp"
-        elif [[ "$udpmode" = 1 ]]; then
+        elif [ "$udpmode" = "1" ]; then
             tcpudp="udp"
         fi
 
         local port_forward
-	if [[ ( "$SS_SERVER" = "ss-local" || "$SS_SERVER" = "ss-server" || "$SS_SERVER" = "ss-tunnel" || "$SS_SERVER" = "ss-manager" ) && -n "$ip" ]]; then
+	if { [ "$SS_SERVER" = "ss-local" ] || [ "$SS_SERVER" = "ss-server" ] || [ "$SS_SERVER" = "ss-tunnel" ] || [ "$SS_SERVER" = "ss-manager" ]; } && [ -n "$ip" ]; then
             port_forward="yes"
         else
             port_forward="no"
@@ -122,7 +123,7 @@ gensc ()
 	EOF
 	fi
 
-    done < <( find -L "$CONFIG_DIR" -maxdepth 1 -regextype posix-extended -regex "$CONFFILES_REGEX" -type f )
+    done
 
 }
 
@@ -136,3 +137,4 @@ else
     mv "$PORT_SC_FILE_TMP" "$PORT_SC_FILE"
     /usr/syno/sbin/synopkghelper update shadowsocks-libev port-config && echo " updated successfully" || echo " but ERROR during update"
 fi
+
