@@ -199,6 +199,9 @@ Ext.onReady(function() {
 				if (node == null || !node.isLeaf()) {
 					Ext.Msg.show({title:"Delete config file",msg:"Select first in the tree the file to delete.",buttons: Ext.Msg.OK,icon: Ext.Msg.INFO});
 					return;
+				} else if (startstopBtn.getText() == "Stop") {
+					Ext.Msg.show({title:"Delete config file",msg:"Stop the service first.",buttons: Ext.Msg.OK,icon: Ext.Msg.INFO});
+					return;
 				} else {
 					var filename = node.text;
 					Ext.Msg.confirm("Delete file", "Confirm to permanently delete config file: " + filename,function(btn){
