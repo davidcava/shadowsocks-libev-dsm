@@ -1,5 +1,5 @@
 #!/bin/bash
-# checked with: shellcheck -x start-stop-status.sh
+# checked with: shellcheck -x
 
 # Source package specific variable and functions
 SVC_SETUP="$(dirname "$0")/service-setup"
@@ -99,14 +99,15 @@ start_daemon ()
 
     # Run network configuration scripts for ss-redir (iptables REDIRECT / TPROXY...)
     if [ "$tcpredir" = 1 ] && [ -f "$SCRIPT_REDIRECT" ]; then
-        if [[ -x "$SCRIPT_REDIRECT" && $(stat -c %A "$SCRIPT_REDIRECT") =~ r...-..-.$ ]]; then
+        #if [[ -x "$SCRIPT_REDIRECT" && $(stat -c %A "$SCRIPT_REDIRECT") =~ r...-..-.$ ]]; then
+        if [ -x "$SCRIPT_REDIRECT" ] && expr "$(stat -c %A "$SCRIPT_REDIRECT")" : .r...-..-.$ >>/dev/null; then
             "$SCRIPT_REDIRECT"
         else
             echo "ERROR: Script file must only be writable by its user: $SCRIPT_REDIRECT" >> "$SYNOPKG_TEMP_LOGFILE"
         fi
     fi
     if [ "$udpredir" = 1 ] && [ -f "$SCRIPT_TPROXY" ]; then
-        if [[ -x "$SCRIPT_TPROXY" && $(stat -c %A "$SCRIPT_TPROXY") =~ r...-..-.$ ]]; then
+        if [ -x "$SCRIPT_TPROXY" ] && expr "$(stat -c %A "$SCRIPT_TPROXY")" : .r...-..-.$ >>/dev/null; then
             "$SCRIPT_TPROXY"
         else
             echo "ERROR: Script file must only be writable by its user: $SCRIPT_TPROXY" >> "$SYNOPKG_TEMP_LOGFILE"
