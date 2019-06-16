@@ -50,7 +50,7 @@ Example: `/var/packages/shadowsocks-libev/etc/ss-redir-Korea.ipt-rules-exclude`
 - Download libev source into the toolkit and add the DSM build script
   ```sh
   cd /toolkit/source
-  cvs -z3 -d :pserver:anonymous@cvs.schmorp.de/schmorpforge co libev
+  cvs -z3 -d :pserver:anonymous@cvs.schmorp.de/schmorpforge co -r rel-4_25 libev
   cd libev
   ln -s ../shadowsocks-libev/shadowsocks-libev-dsm/libev/SynoBuildConf .
   ```
