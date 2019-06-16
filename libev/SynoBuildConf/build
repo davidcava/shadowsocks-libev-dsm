@@ -17,7 +17,7 @@ case ${CleanOnly} in
         ;;
 esac
 
-./autogen.sh
+/bin/sh ./autogen.sh
 
 # LDFLAGS -s for stripping
 env CC="${CC}" CXX="${CXX}" LD="${LD}" AR=${AR} STRIP=${STRIP} RANLIB=${RANLIB} NM=${NM} \
