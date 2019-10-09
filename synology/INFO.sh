@@ -1,10 +1,10 @@
 #!/bin/sh
-# Copyright (c) 2018 David Cavallini
+# Copyright (c) 2019 David Cavallini
 
 . /pkgscripts-ng/include/pkg_util.sh
 
 package="shadowsocks-libev"
-version="3.3.0-1"
+version="3.3.1-1"
 displayname="Shadowsocks-libev"
 arch="$(pkg_get_platform) "
 maintainer="David Cavallini"
