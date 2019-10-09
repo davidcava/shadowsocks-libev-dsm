@@ -46,7 +46,7 @@ SetupPackageFiles() {
     elif [ "$PLATFORM_FAMILY" = "SYNOPLAT_F_ARMV7" ]; then
        v2rayarch="arm7"
     elif [ "$PLATFORM_FAMILY" = "SYNOPLAT_F_ARMV8" ]; then
-       v2rayarch="arm64"
+       v2rayarch="arm7" #Not sure this works
     elif [ "$PLATFORM_FAMILY" = "SYNOPLAT_F_PPC" ]; then
        echo "WARNING! No v2ray-plugin for $PLATFORM_FAMILY"
        v2rayarch="none"
