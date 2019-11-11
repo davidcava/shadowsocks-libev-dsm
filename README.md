@@ -13,10 +13,12 @@ After installing the package, create configuration files and start the service(s
 Note: configuration file(s) are stored into `/var/packages/shadowsocks-libev/etc`.
 Names must be: `ss-local.json` `ss-tunnel.json` `ss-redir.json` `ss-server.json` `ss-manager.json`
 Additional instances can be created with names: `ss-local-xxx.json` `ss-tunnel-xxx.json` etc.
+When removing the package, the config files are kept in folder `/usr/syno/etc/packages/shadowsocks-libev`. They are reused if the package is reinstalled.
 
 If ss-redir is used, then routing will be activated. The incoming non-local traffic will be routed to ss-redir through iptables. udp will/might not work (see limitation below).
 
 # Limitation
+- Service is considered "started" in DSM even though no shadowsocks service could be started. This is needed for DSM to show the shadowsocks config app in the app list.
 - Only works on DSM 6.1 and 6.2
 - I don't know how to compile v2ray-plugin using Synology's dev environment so I just copy the binaries provided in the project. Not really sure which one goes into which architecture so probably not working for all. If not working, just drop the v2ray-plugin executable into /var/packages/shadowsocks-libev/target/bin (and tell me what works for you).
 - Graphical interface is still experimental: it works well on my model but might not on others. Use SSH and edit config files manually if any issue.
