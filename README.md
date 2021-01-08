@@ -18,6 +18,7 @@ When removing the package, the config files are kept in folder `/usr/syno/etc/pa
 If ss-redir is used, then routing will be activated. The incoming non-local traffic will be routed to ss-redir through iptables. udp will/might not work (see limitation below).
 
 # Limitation
+- The user installing the package must have admin rights. Since 3.3.5, being the default admin user is not needed anymore.
 - Service is considered "started" in DSM even though no shadowsocks service could be started. This is needed for DSM to show the shadowsocks config app in the app list.
 - Only works on DSM 6.1 and 6.2
 - I don't know how to compile v2ray-plugin using Synology's dev environment so I just copy the binaries provided in the project. Not really sure which one goes into which architecture so probably not working for all. If not working, just drop the v2ray-plugin executable into /var/packages/shadowsocks-libev/target/bin (and tell me what works for you).
