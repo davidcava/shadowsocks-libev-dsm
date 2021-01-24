@@ -6,7 +6,7 @@
 package="shadowsocks-libev"
 version="3.3.5-1"
 displayname="Shadowsocks-libev"
-arch="$(pkg_get_platform) "
+arch="$(pkg_get_platform_family)"
 maintainer="David Cavallini"
 distributor="davidcava"
 distributor_url="https://github.com/davidcava/"

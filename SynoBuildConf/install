@@ -46,7 +46,7 @@ SetupPackageFiles() {
     elif [ "$PLATFORM_FAMILY" = "SYNOPLAT_F_ARMV7" ]; then
        v2rayarch="arm7"
     elif [ "$PLATFORM_FAMILY" = "SYNOPLAT_F_ARMV8" ]; then
-       v2rayarch="arm7" #Not sure this works
+       v2rayarch="arm64"
     elif [ "$PLATFORM_FAMILY" = "SYNOPLAT_F_PPC" ]; then
        echo "WARNING! No v2ray-plugin for $PLATFORM_FAMILY"
        v2rayarch="none"
@@ -102,8 +102,8 @@ SetupPackageFiles() {
 
 MakePackage() {
     source /pkgscripts-ng/include/pkg_util.sh
-    pkg_make_package $INST_DIR $PKG_DIR
-    pkg_make_spk $PKG_DIR $PKG_DEST
+    pkg_make_package $INST_DIR $PKG_DIR #same as pkg_make_inner_tarball
+    pkg_make_spk $PKG_DIR $PKG_DEST $(pkg_get_spk_family_name)
 }
 
 main() {
