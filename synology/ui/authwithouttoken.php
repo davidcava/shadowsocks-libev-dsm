@@ -42,12 +42,11 @@ if ($username == '') {
 }
 
 // Not admin
-/* removed because a user might have admin rights without being admin. TODO: find a way...
-if ($username !== 'admin') {
-	echo $_SERVER['SERVER_PROTOCOL'] . " 400 Bad Request\n";
-	echo "Content-type: text/html; charset=utf-8\n\n";
-	echo '<HTML><HEAD><TITLE>Login Required</TITLE></HEAD><BODY>Please login first as admin</BODY></HTML>';
-	exit;
+exec('/bin/id -G -n ' . escapeshellarg($username) . ' | grep -qE "( |^)administrators( |$)"', $dummy, $retval);
+if ( $retval != 0 ) {
+    echo $_SERVER['SERVER_PROTOCOL'] . " 400 Bad Request\n";
+    echo "Content-type: text/html; charset=utf-8\n\n";
+    echo "<HTML><HEAD><TITLE>Login Required</TITLE></HEAD><BODY>Please use an account with admin rights ($username has not)</BODY></HTML>";
+    exit;
 }
-*/
 
