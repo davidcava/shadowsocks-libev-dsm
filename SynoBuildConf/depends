@@ -4,4 +4,4 @@ libev
 simple-obfs
 
 [default]
-all="6.2"
+all="7.0"

@@ -1,0 +1,12 @@
+#!/bin/bash
+
+# Source package specific variable and functions
+SVC_SETUP="$(dirname "$0")/service-setup"
+if [ -r "${SVC_SETUP}" ]; then
+    #shellcheck source=service-setup
+    . "${SVC_SETUP}"
+fi
+
+chown root:shadowsocks-libev "$INSTALL_DIR"/ui/*.cgi "$INSTALL_DIR"/ui/*.php
+mv "$SYNOCONF_DIR"/privilege.wanted "$SYNOCONF_DIR"/privilege
+

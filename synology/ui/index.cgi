@@ -7,11 +7,11 @@ echo "Content-type: text/html; charset=utf-8\n\n";
 <html>
 <head>
     <title>Shadowsocks-libev</title>
-    <link rel="stylesheet" type="text/css" href="/scripts/ext-3/resources/css/ext-all.css"/>
+    <link rel="stylesheet" type="text/css" href="/scripts/ext-3.4-compatible-6.x/resources/css/ext-all.css"/>
         <!-- yup, I'm mixing themes from both versions, gives a bit more native look -->
-    <link rel="stylesheet" type="text/css" href="/scripts/ext-3/resources/css/xtheme-gray.css"/>
-    <script type="text/javascript" src="/scripts/ext-3/adapter/ext/ext-base.js"></script>
-    <script type="text/javascript" src="/scripts/ext-3/ext-all.js"></script>
+    <link rel="stylesheet" type="text/css" href="/scripts/ext-3.4-compatible-6.x/resources/css/xtheme-gray.css"/>
+    <script type="text/javascript" src="/scripts/ext-3.4-compatible-6.x/adapter/ext/ext-base.js"></script>
+    <script type="text/javascript" src="/scripts/ext-3.4-compatible-6.x/ext-all.js"></script>
     <script src="/webman/dsmtoken.cgi"></script>
 </head>
 <body>

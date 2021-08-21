@@ -1,6 +1,7 @@
 #!/usr/bin/env php
 <?php
-require 'authenticate.php';
+#require 'authenticate.php';
+require 'authwithouttoken.php';
 require 'synoenv.php';
 
 echo "Content-type: application/json; charset=utf-8\n\n";

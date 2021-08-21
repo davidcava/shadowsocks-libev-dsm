@@ -2,43 +2,5 @@
   "defaults":{
     "run-as": "package"
   }
-,
-    "ctrl-script": [
-    {
-        "action": "start",
-        "run-as": "root"
-    },{
-        "action": "stop",
-        "run-as": "root"
-    },{
-        "action": "status",
-        "run-as": "root"
-    }
-    ]
-,
-  "executable": [
-   {
-    "relpath": "ui/index.cgi",
-    "run-as": "root"
-   },{
-    "relpath": "ui/getfilelist.cgi",
-    "run-as": "root"
-   },{
-    "relpath": "ui/getfile.cgi",
-    "run-as": "root"
-   },{
-    "relpath": "ui/status.cgi",
-    "run-as": "root"
-   },{
-    "relpath": "ui/writefile.cgi",
-    "run-as": "root"
-   },{
-    "relpath": "ui/deletefile.cgi",
-    "run-as": "root"
-   },{
-    "relpath": "ui/startstop.cgi",
-    "run-as": "root"
-   }
-  ]
 }
 

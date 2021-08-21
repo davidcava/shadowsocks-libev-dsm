@@ -80,7 +80,6 @@ SetupPackageFiles() {
     install -D -m 0644 -t $INST_DIR/ui/templates synology/ui/templates/*
 
     echo SynoBuildConf/install: Adding DSM specific dirs
-    mkdir $INST_DIR/var
     install -D -m 0644 -t $INST_DIR/port_conf synology/port_conf/$PKG_NAME.sc
     install -D -m 0644 -t $INST_DIR/etc synology/etc/*
 

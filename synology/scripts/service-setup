@@ -17,33 +17,36 @@ export SYNOPKG_PKGNAME
 export SYNOPKG_PKGDEST
 export SYNOPKG_TEMP_LOGFILE
 
-# Package technical name / id
-PACKAGE="$SYNOPKG_PKGNAME"
-
 # Package full name - not possible to get it?
 DNAME="$SYNOPKG_PKGNAME"
+
+# Root dir
+ROOT_DIR="/var/packages/$SYNOPKG_PKGNAME"
 
 # Installation directory .../target, files in here replaced when the package is updated
 INSTALL_DIR="$SYNOPKG_PKGDEST"
 
-# Directory to store running server pid(s)
-PID_DIR="$INSTALL_DIR/var"
+# Configuration files directory (Shadowsocks json files)
+CONFIG_DIR="$ROOT_DIR/etc"
 
-# Configuration files directory
-CONFIG_DIR="/var/packages/$SYNOPKG_PKGNAME/etc"
+# DSM conf/ directory with resource, privilege, systemd files
+SYNOCONF_DIR="$ROOT_DIR/conf"
+
+# DSM var/ directory
+SYNOVAR_DIR="${SYNOPKG_PKGVAR:-$ROOT_DIR/var}"
 
 # Script directory
 SCRIPT_DIR=$(readlink -f "$(dirname -- "$0")")
 
+# Directory to store running server pid(s)
+PID_DIR="$SYNOVAR_DIR"
+
 # start-stop-status script redirect stdout/stderr to LOG_FILE
-LOG_FILE="$SYNOPKG_PKGDEST/var/$SYNOPKG_PKGNAME.log"
+LOG_FILE="$SYNOVAR_DIR/$SYNOPKG_PKGNAME.log"
 
 # Those evnt variables impact regex matching
 LANG=en_US.utf8
 LC_ALL=en_US.utf8
-
-export LD_LIBRARY_PATH="$INSTALL_DIR/lib"
-export PATH="$INSTALL_DIR/bin:$PATH"
 
 # Standard iptables installed in DSM
 IPT=/sbin/iptables

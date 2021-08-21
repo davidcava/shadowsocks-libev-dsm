@@ -5,6 +5,10 @@
 	"syslog-config": {
 		"patterndb-relpath": "etc/shadowsocks-libev.conf",
 		"logrotate-relpath": "etc/shadowsocks-libev-logrotate.conf"
+	},
+	"usr-local-linker": {
+		"bin": ["bin/ss-local", "bin/ss-server", "bin/ss-redir", "bin/ss-tunnel", "bin/ss-manager", "bin/v2ray-plugin", "bin/obfs-local", "bin/obfs-server"],
+		"lib": ["lib/libev.so", "lib/libev.so.4", "lib/libev.so.4.0.0", "lib/libmbedcrypto.so", "lib/libmbedcrypto.so.3"]
 	}
 } 
 
