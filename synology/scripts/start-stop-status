@@ -179,8 +179,9 @@ setvars_unit_file ()
 exit_if_not_root ()
 {
     if [ ! "$(id -u)" = "0" ]; then
-        echo "Cannot proceed because not root. Connect though SSH, run the following command and restart: sudo /var/packages/shadowsocks-libev/scripts/addprivileges" >> "$SYNOPKG_TEMP_LOGFILE"
-        echo "Cannot proceed because not root. Connect though SSH, run the following command and restart: sudo /var/packages/shadowsocks-libev/scripts/addprivileges"
+	rootmsg="You need to grant root privileges to the package components. Connect though SSH, run the following command: sudo /var/packages/shadowsocks-libev/scripts/addprivileges. Then stop and start the package."
+        echo "$rootmsg" >> "$SYNOPKG_TEMP_LOGFILE"
+        echo "$rootmsg"
         exit 0 # We should exit 1 but this triggers a "repair", not what we want
     fi
 }

@@ -6,7 +6,9 @@ INST_DIR="/tmp/_${PKG_NAME}"
 PKG_DIR="/tmp/_${PKG_NAME}_pkg"
 PKG_DEST="/image/packages"
 
-INST_DIR_EXPECTED_FILES=41
+#INST_DIR_EXPECTED_FILES=41
+# 356 files for ext-js
+INST_DIR_EXPECTED_FILES=397
 
 LANG=C; export LANG
 LC_ALL=C; export LC_ALL
@@ -74,6 +76,7 @@ SetupPackageFiles() {
     mkdir $INST_DIR/ui
     install -D -m 0755 -t $INST_DIR/ui synology/ui/*.cgi synology/ui/*.php
     install -D -m 0644 -t $INST_DIR/ui synology/ui/config
+    cp -r synology/ui/ext-3.4.1/ $INST_DIR/ui/
     mkdir $INST_DIR/ui/images
     install -D -m 0644 -t $INST_DIR/ui/images synology/ui/images/*
     mkdir $INST_DIR/ui/templates

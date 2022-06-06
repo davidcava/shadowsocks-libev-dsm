@@ -17,13 +17,21 @@ When removing the package, the config files are kept and reused if the package i
 
 If ss-redir is used, then routing will be activated. The incoming non-local traffic will be routed to ss-redir through iptables. udp will/might not work (see limitation below).
 
+In DSM7, the services use Systemd. You can check / control them in the SSH shell (as root) with commands such as:
+```sh
+systemctl list-units -a | grep pkg-ss-
+synosystemctl start pkg-ss-local@ss-local
+systemctl stop --type=service 'pkg-ss-*'
+systemctl status pkg-ss-local@ss-local
+```
+
 # Limitation
 - The user installing the package must have admin rights. Since 3.3.5, being the default admin user is not needed anymore.
-- Since DSM7, after installing the package, it is needed to manually ssh into the Synology and run: sudo /var/packages/shadowsocks-libev/scripts/addprivileges. I had a hard time with the migration to DSM7 so things might still have bugs.
+- Since DSM7, after installing the package, it is needed to manually ssh into the Synology and run: sudo /var/packages/shadowsocks-libev/scripts/addprivileges.
 - Service is considered "started" in DSM even though no shadowsocks service could be started. This is needed for DSM to show the shadowsocks config app in the app list.
 - Branch dsm6 works on DSM 6.1 and 6.2 (not maintained anymore). Branch master works on DSM 7.
 - I don't know how to compile v2ray-plugin using Synology's dev environment so I just copy the binaries provided in the project. Not really sure which one goes into which architecture so probably not working for all. If not working, just drop the v2ray-plugin executable into /var/packages/shadowsocks-libev/target/bin (and tell me what works for you).
-- Graphical interface is still experimental: it works well on my model but might not on others. Use SSH and edit json files manually if any issue.
+- Graphical interface works well on my model and seems to work on other models. If any issue, use SSH and edit json files manually.
 - Graphical interface does not allow to view the logs.
 - DSM does not include the needed kernel modules for TProxy (at least on my model), which prevents using ss-redir with udp. Workaround is possible by recompiling the missing modules and iptables.
 - When ss-redir is used, only incoming traffic is redirected (chain PREROUTING). DSM traffic itself is not sent to ss-redir (chain OUTPUT).
