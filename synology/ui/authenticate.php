@@ -1,4 +1,6 @@
 <?php
+error_reporting(E_ERROR);
+
 parse_str($_SERVER['QUERY_STRING'], $_GET);
 
 // Replicate the current environment but change method to GET to avoid called cgi to expect a stdin content

@@ -35,7 +35,7 @@ systemctl status pkg-ss-local@ss-local
 - Graphical interface does not allow to view the logs.
 - DSM does not include the needed kernel modules for TProxy (at least on my model), which prevents using ss-redir with udp. Workaround is possible by recompiling the missing modules and iptables.
 - When ss-redir is used, only incoming traffic is redirected (chain PREROUTING). DSM traffic itself is not sent to ss-redir (chain OUTPUT).
-- I am using ss-local, ss-tunnel and ss-redir on my DS214play (evansport architecture) under DSM 7, anything else is not tested. Feedback welcome!
+- I am using ss-local, ss-tunnel and ss-redir on my DS214play (evansport architecture) under DSM 7.1, anything else is not tested. Feedback welcome!
 
 # Advanced
 - It is possible to control which traffic goes to which ss-redir-xxx by putting iptables directives into files `ss-redir-xxx.ipt-rules-exclude` and/or `ss-redir-xxx.ipt-rules-include`. Packets matching the iptables rules within those files are excluded and/or included from being redirected. Those files cannot be created with the graphical interface.
@@ -89,7 +89,7 @@ Example: `/var/packages/shadowsocks-libev/etc/ss-redir-Korea.ipt-rules-exclude`
 - If everything went fine, package is now in `/toolkit/result_spk`
 
 # Licence
-    Copyright (c) 2018 2019 David Cavallini
+    Copyright (c) 2018 2019 2020 2021 2022 2023 David Cavallini
 
     shadowsocks-libev-dsm is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
